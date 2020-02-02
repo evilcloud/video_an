@@ -59,13 +59,14 @@ def valid_dir(root, directory):
     if not os.path.exists(root):
         print(f"Creating {root}")
         os.mkdir(root)
-    if not os.path.exists(root + directory):
-        print(f"Creating {root + directory}")
-        os.mkdir(root + directory)
-    return root + directory
+    full_path = root + directory
+    if not os.path.exists(full_path):
+        print(f"Creating {full_path}")
+        os.mkdir(full_path)
+    return full_path
 
 
-root = "work_files/"
+ROOT = "work_files/"
 video, vPafy = get_url()
 cap = cv2.VideoCapture(video.url)
 count = 0
@@ -73,7 +74,8 @@ current_faces = 0
 max_faces = 0
 screen_time = 0
 start_time = time.time()
-directory = valid_dir(root, vPafy.videoid)
+directory = valid_dir(ROOT, vPafy.videoid)
+
 while True:
     count += 1
     run_time = time.time() - start_time
@@ -95,9 +97,10 @@ while True:
     draw_faces(faces, frame)
 
     current_faces = len(faces)
-    if max_faces < current_faces:
-        cv2.imwrite(directory + "/" + str(max_faces) + "_" + str(count) + ".png", frame)
-        max_faces = current_faces
+    if current_faces < max_faces:
+        cv2.imwrite(directory + "/" + str(current_faces) + "_" + str(count) + ".png", frame)
+    max_faces = max(current_faces, max_faces)
+
     screen_time += 1
     cv2.imshow(vPafy.title, frame)
 
