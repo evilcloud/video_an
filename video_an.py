@@ -55,12 +55,17 @@ def draw_faces(faces, frame):
     return
 
 
-def valid_dir(directory):
-    if directory not in os.listdir("."):
-        os.mkdir(directory)
-    return directory
+def valid_dir(root, directory):
+    if not os.path.exists(root):
+        print(f"Creating {root}")
+        os.mkdir(root)
+    if not os.path.exists(root + directory):
+        print(f"Creating {root + directory}")
+        os.mkdir(root + directory)
+    return root + directory
 
 
+root = "work_files/"
 video, vPafy = get_url()
 cap = cv2.VideoCapture(video.url)
 count = 0
@@ -68,7 +73,7 @@ current_faces = 0
 max_faces = 0
 screen_time = 0
 start_time = time.time()
-valid_dir(vPafy.videoid)
+directory = valid_dir(root, vPafy.videoid)
 while True:
     count += 1
     run_time = time.time() - start_time
@@ -91,13 +96,10 @@ while True:
 
     current_faces = len(faces)
     if max_faces < current_faces:
-        cv2.imwrite(
-            vPafy.videoid + "/" + str(max_faces) + "_" + str(count) + ".png", frame
-        )
+        cv2.imwrite(directory + "/" + str(max_faces) + "_" + str(count) + ".png", frame)
         max_faces = current_faces
     screen_time += 1
     cv2.imshow(vPafy.title, frame)
-
 
     if cv2.waitKey(20) & 0xFF == ord("q"):
         print(f"\nCancellation initiated.\nExiting...")
