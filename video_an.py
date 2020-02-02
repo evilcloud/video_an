@@ -45,7 +45,7 @@ def draw_faces(faces, frame):
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
         cv2.putText(
             frame,
-            str(i),
+            str(i+1),
             (x + 10, y + 20),
             cv2.FONT_HERSHEY_PLAIN,
             1.5,
@@ -97,7 +97,7 @@ while True:
     draw_faces(faces, frame)
 
     current_faces = len(faces)
-    if current_faces < max_faces:
+    if current_faces > max_faces:
         cv2.imwrite(directory + "/" + str(current_faces) + "_" + str(count) + ".png", frame)
     max_faces = max(current_faces, max_faces)
 
