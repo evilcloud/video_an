@@ -1,6 +1,7 @@
 import os
 import cv2
 import pafy
+import youtube_dl
 import time
 from datetime import timedelta
 
@@ -11,13 +12,13 @@ from datetime import timedelta
 def detect_haar_faces(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     face_cascasde = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-    faces = face_cascasde.detectMultiScale(gray, 1.1, 4)
+    faces = face_cascasde.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=10, minSize=(30, 30), flags = cv2.CASCADE_SCALE_IMAGE)
     return faces
 
 
 def detect(image):
-    faces = detect_haar_faces(image)
-    return faces
+    objects = detect_haar_faces(image)
+    return objects
 
 
 def frame_text(text, vertical):
@@ -26,6 +27,25 @@ def frame_text(text, vertical):
     )
     return
 
+# def get_url():
+#     url = input("YouTube URL: ")
+#     if not url:
+#         print("Running test video -- 3 seconds, 70 frames")
+#         url= "https://www.youtube.com/watch?v=ighghZIoP1k"
+#     return url
+
+# def get_best_video(url):
+#     vPafy = pafy.new(url, gdata=True)
+#     print(f"Loading {video.title} {vPafy.duration}")
+#     video = vPafy.getbest()
+#     print(f"Best case {video.extension} {video.mediatype} in {video.resolution}")
+#     print(f"Length: {vPafy.length}")
+#     return video, vPafy
+
+# def download_video(video, vPafy):
+#     best.dowload(quiet=False)
+#     return 
+    
 
 def get_url():
     url = input("YouTube URL: ")
@@ -40,9 +60,9 @@ def get_url():
     return video, vPafy
 
 
-def draw_faces(faces, frame):
-    for i, (x, y, w, h) in enumerate(faces):
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+def draw_objects(objects, frame):
+    for i, (x, y, w, h) in enumerate(objects):
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(
             frame,
             str(i+1),
@@ -54,6 +74,10 @@ def draw_faces(faces, frame):
         )
     return
 
+# def draw_edges(objects, frame):
+#     for i, (x, y, w, h) in enumerate(objects):
+#         selection = frame[x:x+w, y:y+h]
+#         cv2.
 
 def valid_dir(root, directory):
     if not os.path.exists(root):
@@ -70,8 +94,8 @@ ROOT = "work_files/"
 video, vPafy = get_url()
 cap = cv2.VideoCapture(video.url)
 count = 0
-current_faces = 0
-max_faces = 0
+current_objects = 0
+max_objects = 0
 screen_time = 0
 start_time = time.time()
 directory = valid_dir(ROOT, vPafy.videoid)
@@ -86,20 +110,20 @@ while True:
         break
 
     frame_text("frame:   {}".format(count), 30)
-    faces = detect(frame)
+    objects = detect(frame)
 
     frame_text(
         "screentime: {} {}%".format(screen_time, int((100 * screen_time) / count)), 50
     )
     frame_text("runtime: {}".format(run_time), 70)
-    frame_text("faces max: {} curr {}".format(max_faces, current_faces), 90)
+    frame_text("objects max: {} curr {}".format(max_objects, current_objects), 90)
 
-    draw_faces(faces, frame)
+    draw_objects(objects, frame)
 
-    current_faces = len(faces)
-    if current_faces > max_faces:
-        cv2.imwrite(directory + "/" + str(current_faces) + "_" + str(count) + ".png", frame)
-    max_faces = max(current_faces, max_faces)
+    current_objects = len(objects)
+    if current_objects > max_objects:
+        cv2.imwrite(directory + "/" + str(current_objects) + "_" + str(count) + ".png", frame)
+    max_objects = max(current_objects, max_objects)
 
     screen_time += 1
     cv2.imshow(vPafy.title, frame)
@@ -110,8 +134,9 @@ while True:
 
 
 # Done here
+cv2.destroyAllWindows()
 print(f"Total frames      {count}")
 print(f"Total runtime     {timedelta(seconds=run_time)}")
 print(f"Original speed {vPafy.length} sec -- {int(100 * vPafy.length / run_time)}%")
 print(f"Total screentime  {screen_time}")
-print(f"Max objects shown {max_faces}")
+print(f"Max objects shown {max_objects}")
