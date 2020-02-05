@@ -3,7 +3,9 @@ import cv2
 import pafy
 import youtube_dl
 import time
+import pyyaml
 from datetime import timedelta
+from video_provider import VideoProvider
 
 # cd "/Applications/Python 3.8/"
 # sudo "./Install Certificates.command"
@@ -47,17 +49,17 @@ def frame_text(text, vertical):
 #     return 
     
 
-def get_url():
-    url = input("YouTube URL: ")
-    if not url:
-        # return False
-        url = "https://www.youtube.com/watch?v=ighghZIoP1k"
-    vPafy = pafy.new(url, gdata=True)
-    print(f"Capturing {vPafy.title} {vPafy.duration}")
-    video = vPafy.getbest()
-    print(f"Loading {video.extension} {video.mediatype} in {video.resolution}")
-    print(f"Lenght: {vPafy.length}")
-    return video, vPafy
+# def get_url():
+#     url = input("YouTube URL: ")
+#     if not url:
+#         # return False
+#         url = "https://www.youtube.com/watch?v=ighghZIoP1k"
+#     vPafy = pafy.new(url, gdata=True)
+#     print(f"Capturing {vPafy.title} {vPafy.duration}")
+#     video = vPafy.getbest()
+#     print(f"Loading {video.extension} {video.mediatype} in {video.resolution}")
+#     print(f"Lenght: {vPafy.length}")
+#     return video, vPafy
 
 
 def draw_objects(objects, frame):
@@ -79,31 +81,32 @@ def draw_objects(objects, frame):
 #         selection = frame[x:x+w, y:y+h]
 #         cv2.
 
-def valid_dir(root, directory):
-    if not os.path.exists(root):
-        print(f"Creating {root}")
-        os.mkdir(root)
-    full_path = root + directory
-    if not os.path.exists(full_path):
-        print(f"Creating {full_path}")
-        os.mkdir(full_path)
-    return full_path
+# def valid_dir(directory):
+#     if not os.path.exists(root):
+#         print(f"Creating {root}")
+#         os.mkdir(root)
+#     full_path = root + directory
+#     if not os.path.exists(full_path):
+#         print(f"Creating {full_path}")
+#         os.mkdir(full_path)
+#     return full_path
 
 
-ROOT = "work_files/"
+# ROOT = "work_files/"
 video, vPafy = get_url()
-cap = cv2.VideoCapture(video.url)
+# cap = cv2.VideoCapture(video.url)
+videoprovider = VideoProvider(video.url, option='stream')
 count = 0
 current_objects = 0
 max_objects = 0
 screen_time = 0
 start_time = time.time()
-directory = valid_dir(ROOT, vPafy.videoid)
+directory = valid_dir(vPafy.videoid)
 
 while True:
     count += 1
     run_time = time.time() - start_time
-    ret, frame = cap.read()
+    ret, frame = VideoProvider.getFrame()
 
     if not ret:
         print(f"\nEnd of file reached")
