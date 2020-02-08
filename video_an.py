@@ -3,9 +3,10 @@ import cv2
 import pafy
 import youtube_dl
 import time
-import pyyaml
+# import pyyaml
 from datetime import timedelta
-from video_provider import VideoProvider
+from video_provider.video_provider import VideoProvider
+from video_provider.video_provider import get_url
 
 # cd "/Applications/Python 3.8/"
 # sudo "./Install Certificates.command"

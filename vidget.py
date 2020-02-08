@@ -32,3 +32,5 @@ def download_video(video, vPafy):
     return 
 
 url = get_url()
+video, vPafy = get_best_video(url)
+download_video(video)

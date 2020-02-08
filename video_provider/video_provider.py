@@ -15,6 +15,7 @@ class VideoProvider:
         else:
             return False
         return cap.read
+    
     def get_url(self):
         self.url = input("YouTube URL: ")
         if not self.url:
